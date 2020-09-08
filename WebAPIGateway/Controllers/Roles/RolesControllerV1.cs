@@ -54,11 +54,16 @@ namespace WebAPIGateway.Controllers.Roles
         /// <param name="role">Role Name</param>
         /// <param name="key">Application's secret key</param>
         /// <returns></returns>
-        [HttpGet("AddNewRole")]
+        [HttpPost("AddNewRole")]
         [ProducesResponseType(200, Type = typeof(bool))]
         [ProducesErrorResponseType(typeof(APIErrorResponse))]
-        public IActionResult AddNewRole(string role, string key)
+        public IActionResult AddNewRole([FromBody] CreateRoleModel roleData)
         {
+            var validation = ValidateModel();
+            if (validation != null)
+            {
+                return validation;
+            }
             var model = Try(() =>
             {
                 var status = true;
