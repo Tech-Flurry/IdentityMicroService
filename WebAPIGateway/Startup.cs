@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Domain.Infrastucture;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -34,6 +36,11 @@ namespace WebAPIGateway
                 x.DefaultApiVersion = new ApiVersion(1, 0);
                 x.AssumeDefaultVersionWhenUnspecified = true;
                 x.ReportApiVersions = true;
+            });
+            services.SetupValidations();
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
             });
             services.AddSwaggerGen(c =>
             {
@@ -74,7 +81,7 @@ namespace WebAPIGateway
             app.UseRouting();
 
             app.UseAuthorization();
-
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

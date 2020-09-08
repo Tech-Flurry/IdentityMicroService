@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using WebAPIGateway.Infrastructure.InternalModels;
 
 namespace WebAPIGateway.Infrastructure
 {
-    public class IdentityControllersBase : ControllerBase
+    public abstract class IdentityControllersBase : ControllerBase
     {
         public override OkObjectResult Ok([ActionResultObjectValue] object value)
         {
@@ -18,7 +21,7 @@ namespace WebAPIGateway.Infrastructure
         {
             return base.BadRequest();
         }
-        protected static T Try<T>(Func<T> func, out bool isSuccessful)
+        protected T Try<T>(Func<T> func, out bool isSuccessful)
         {
             try
             {
@@ -31,6 +34,31 @@ namespace WebAPIGateway.Infrastructure
                 isSuccessful = false;
                 throw ex;
             }
+        }
+        protected IActionResult Throw(string message)
+        {
+            return BadRequest(new APIErrorResponse { ErrorMessage = message });
+        }
+        protected IActionResult Throw(Exception ex)
+        {
+            return BadRequest(new APIErrorResponse { ErrorMessage = ex.Message });
+        }
+        protected IActionResult Throw(List<string> messages)
+        {
+            return BadRequest(new APIErrorResponse { ErrorMessage = string.Join(", ", messages) });
+        }
+        protected IActionResult ValidateModel()
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.Where(v => v.Errors.Count > 0)
+                    .SelectMany(v => v.Errors)
+                    .Select(v => v.ErrorMessage)
+                    .ToList();
+
+                return Throw(errors);
+            }
+            return null;
         }
     }
 }

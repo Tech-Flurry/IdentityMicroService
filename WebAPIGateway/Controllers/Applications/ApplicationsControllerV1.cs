@@ -102,6 +102,11 @@ namespace WebAPIGateway.Controllers.Applications
         [ProducesErrorResponseType(typeof(APIErrorResponse))]
         public IActionResult CreateNewApplication([FromBody] CreateApplicationModel appInfo)
         {
+            var validation = ValidateModel();
+            if (validation != null)
+            {
+                return validation;
+            }
             var model = Try(() =>
             {
                 var secret = "AezaIwxfyupoossnjnjnlmmllm";
@@ -126,6 +131,11 @@ namespace WebAPIGateway.Controllers.Applications
         [ProducesErrorResponseType(typeof(APIErrorResponse))]
         public IActionResult UpdateApplication([FromBody] UpdateApplicationModel appInfo)
         {
+            var validation = ValidateModel();
+            if (validation != null)
+            {
+                return validation;
+            }
             var model = Try(() =>
             {
                 var status = true;
