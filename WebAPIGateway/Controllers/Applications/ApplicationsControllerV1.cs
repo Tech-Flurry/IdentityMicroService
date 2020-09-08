@@ -7,11 +7,18 @@ using WebAPIGateway.Infrastructure.InternalModels;
 
 namespace WebAPIGateway.Controllers.Applications
 {
-    [Route("identity/[controller]")]
+    /// <summary>
+    /// Controls the actions related to the applications
+    /// </summary>
+    [Route("identity/ApplicationsController")]
     [ApiController]
     [ApiVersion("1.0")]
     public class ApplicationsControllerV1 : IdentityControllersBase
     {
+        /// <summary>
+        /// Returns a list of applications registered in the microservice
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("GetApplicationsList")]
         [ProducesResponseType(200, Type = typeof(List<ApplicationsListModel>))]
         [ProducesErrorResponseType(typeof(APIErrorResponse))]
@@ -37,10 +44,15 @@ namespace WebAPIGateway.Controllers.Applications
                 return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
             }
         }
-        [HttpGet("ValidateApplicationSecerate")]
+        /// <summary>
+        /// Validates a secret key for the application according to the criteria
+        /// </summary>
+        /// <param name="key">Secret key for the applcation</param>
+        /// <returns></returns>
+        [HttpGet("ValidateApplicationSecret")]
         [ProducesResponseType(200, Type = typeof(bool))]
         [ProducesErrorResponseType(typeof(APIErrorResponse))]
-        public IActionResult ValidateApplicationSecerate(string key)
+        public IActionResult ValidateApplicationSecret(string key)
         {
             var model = Try(() =>
             {
@@ -56,15 +68,20 @@ namespace WebAPIGateway.Controllers.Applications
                 return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
             }
         }
-        [HttpGet("GenerateApplicationSecerate")]
+        /// <summary>
+        /// Generates an application secret key 
+        /// </summary>
+        /// <param name="appId">Primary Key of the application</param>
+        /// <returns></returns>
+        [HttpGet("GenerateApplicationSecret")]
         [ProducesResponseType(200, Type = typeof(string))]
         [ProducesErrorResponseType(typeof(APIErrorResponse))]
-        public IActionResult GenerateApplicationSecerate(int appId)
+        public IActionResult GenerateApplicationSecret(int appId)
         {
             var model = Try(() =>
             {
-                var secerate = "AezaIwxfyupoossnjnjnlmmllm";
-                return secerate;
+                var secret = "AezaIwxfyupoossnjnjnlmmllm";
+                return secret;
             }, out bool isSuccessfull);
             if (isSuccessfull)
             {
@@ -75,6 +92,11 @@ namespace WebAPIGateway.Controllers.Applications
                 return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
             }
         }
+        /// <summary>
+        /// Creates new Application
+        /// </summary>
+        /// <param name="appInfo">Model for the new Applcation data</param>
+        /// <returns></returns>
         [HttpPost("CreateNewApplication")]
         [ProducesResponseType(200, Type = typeof(string))]
         [ProducesErrorResponseType(typeof(APIErrorResponse))]
@@ -82,8 +104,8 @@ namespace WebAPIGateway.Controllers.Applications
         {
             var model = Try(() =>
             {
-                var secerate = "AezaIwxfyupoossnjnjnlmmllm";
-                return secerate;
+                var secret = "AezaIwxfyupoossnjnjnlmmllm";
+                return secret;
             }, out bool isSuccessfull);
             if (isSuccessfull)
             {
@@ -94,6 +116,11 @@ namespace WebAPIGateway.Controllers.Applications
                 return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
             }
         }
+        /// <summary>
+        /// Updates the application info
+        /// </summary>
+        /// <param name="appInfo">Model for the new Applcation data</param>
+        /// <returns></returns>
         [HttpPost("UpdateApplication")]
         [ProducesResponseType(200, Type = typeof(bool))]
         [ProducesErrorResponseType(typeof(APIErrorResponse))]
