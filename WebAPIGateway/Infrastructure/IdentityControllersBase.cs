@@ -11,14 +11,17 @@ namespace WebAPIGateway.Infrastructure
     {
         public override OkObjectResult Ok([ActionResultObjectValue] object value)
         {
+            Response.Headers.Add("api-devloped-by", new Microsoft.Extensions.Primitives.StringValues("techflurry.co"));
             return base.Ok(value);
         }
         public override UnauthorizedResult Unauthorized()
         {
+            Response.Headers.Add("api-devloped-by", new Microsoft.Extensions.Primitives.StringValues("techflurry.co"));
             return base.Unauthorized();
         }
         public override BadRequestResult BadRequest()
         {
+            Response.Headers.Add("api-devloped-by", new Microsoft.Extensions.Primitives.StringValues("techflurry.co"));
             return base.BadRequest();
         }
         protected T Try<T>(Func<T> func, out bool isSuccessful)
@@ -37,14 +40,17 @@ namespace WebAPIGateway.Infrastructure
         }
         protected IActionResult Throw(string message)
         {
+            Response.Headers.Add("api-devloped-by", new Microsoft.Extensions.Primitives.StringValues("techflurry.co"));
             return BadRequest(new APIErrorResponse { ErrorMessage = message });
         }
         protected IActionResult Throw(Exception ex)
         {
+            Response.Headers.Add("api-devloped-by", new Microsoft.Extensions.Primitives.StringValues("techflurry.co"));
             return BadRequest(new APIErrorResponse { ErrorMessage = ex.Message });
         }
         protected IActionResult Throw(List<string> messages)
         {
+            Response.Headers.Add("api-devloped-by", new Microsoft.Extensions.Primitives.StringValues("techflurry.co"));
             return BadRequest(new APIErrorResponse { ErrorMessage = string.Join(", ", messages) });
         }
         protected IActionResult ValidateModel()
