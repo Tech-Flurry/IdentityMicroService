@@ -8,7 +8,7 @@ using WebAPIGateway.Infrastructure.InternalModels;
 namespace WebAPIGateway.Controllers.Applications
 {
     /// <summary>
-    /// Controls the actions related to the applications
+    /// Controls the requests related to the applications
     /// </summary>
     [Route("identity/ApplicationsController")]
     [ApiController]
