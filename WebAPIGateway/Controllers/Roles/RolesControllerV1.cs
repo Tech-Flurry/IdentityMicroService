@@ -9,7 +9,7 @@ namespace WebAPIGateway.Controllers.Roles
     /// <summary>
     /// Controls the requests for identity roles
     /// </summary>
-    [Route("identity/ApplicationsController")]
+    [Route("identity/Roles")]
     [ApiController]
     [ApiVersion("1.0")]
     public class RolesControllerV1 : IdentityControllersBase

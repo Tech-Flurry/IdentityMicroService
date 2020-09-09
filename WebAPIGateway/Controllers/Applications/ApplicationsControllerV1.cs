@@ -10,7 +10,7 @@ namespace WebAPIGateway.Controllers.Applications
     /// <summary>
     /// Controls the requests related to the applications
     /// </summary>
-    [Route("identity/ApplicationsController")]
+    [Route("identity/Applications")]
     [ApiController]
     [ApiVersion("1.0")]
     public class ApplicationsControllerV1 : IdentityControllersBase
