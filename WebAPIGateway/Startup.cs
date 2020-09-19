@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using DataAcess.Infrastructure;
 using Domain.Infrastucture;
 using FluentValidation.AspNetCore;
+using InternalServices.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -15,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using WebAPIGateway.Infrastructure;
 
 namespace WebAPIGateway
 {
@@ -61,6 +64,9 @@ namespace WebAPIGateway
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
+            var dbConfiguration = new DbConfiguration(Configuration.GetConnectionString("DefaultConnection"), 1000);
+            services.SetupDb(dbConfiguration);
+            services.UseInternalServices();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -81,7 +87,7 @@ namespace WebAPIGateway
             app.UseRouting();
 
             app.UseAuthorization();
-            
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
