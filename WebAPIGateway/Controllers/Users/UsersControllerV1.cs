@@ -82,6 +82,11 @@ namespace WebAPIGateway.Controllers.Users
                 return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
             }
         }
+        /// <summary>
+        /// Updates a user for an application
+        /// </summary>
+        /// <param name="userInfo">user's information to be updated</param>
+        /// <returns></returns>
         [HttpPost("UpdateUser")]
         [ProducesResponseType(200, Type = typeof(string))]
         [ProducesErrorResponseType(typeof(APIErrorResponse))]
@@ -96,6 +101,91 @@ namespace WebAPIGateway.Controllers.Users
             {
                 var userSecret = "AezaIwxfyupoossnjnjnlmmllm";
                 return userSecret;
+            }, out bool isSuccessfull);
+            if (isSuccessfull)
+            {
+                return Ok(model);
+            }
+            else
+            {
+                return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
+            }
+        }
+        /// <summary>
+        /// Disables a user to perform activity
+        /// </summary>
+        /// <param name="username">Unqiue username</param>
+        /// <param name="key">Application's secret key</param>
+        /// <returns></returns>
+        [HttpGet("DisableUser")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        [ProducesErrorResponseType(typeof(APIErrorResponse))]
+        public IActionResult DisableUser(string username, string key)
+        {
+            var model = Try(() =>
+            {
+                var result = true;
+                return result;
+            }, out bool isSuccessfull);
+            if (isSuccessfull)
+            {
+                return Ok(model);
+            }
+            else
+            {
+                return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
+            }
+        }
+        /// <summary>
+        /// Action used to update the user's phone number
+        /// </summary>
+        /// <param name="userInfo">Data for the user to be updated</param>
+        /// <param name="key">Application's secret key</param>
+        /// <returns>String type OTP</returns>
+        [HttpPost("UpdatePhoneNumber")]
+        [ProducesResponseType(200, Type = typeof(string))]
+        [ProducesErrorResponseType(typeof(APIErrorResponse))]
+        public IActionResult UpdatePhoneNumber([FromBody] UpdatePhoneNumberModel userInfo, [FromQuery] string key)
+        {
+            var validation = ValidateModel();
+            if (validation != null)
+            {
+                return validation;
+            }
+            var model = Try(() =>
+            {
+                var otp = "otp";
+                return otp;
+            }, out bool isSuccessfull);
+            if (isSuccessfull)
+            {
+                return Ok(model);
+            }
+            else
+            {
+                return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
+            }
+        }
+        /// <summary>
+        /// Checks the OTP and confirm phone number update
+        /// </summary>
+        /// <param name="userInfo">Data for the user to be updated</param>
+        /// <param name="key">Application's secret key</param>
+        /// <returns></returns>
+        [HttpPost("UpdatePhoneNumberConfirmation")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        [ProducesErrorResponseType(typeof(APIErrorResponse))]
+        public IActionResult UpdatePhoneNumberConfirmation([FromBody] UpdatePhoneNumberConfirmationModel userInfo, [FromQuery] string key)
+        {
+            var validation = ValidateModel();
+            if (validation != null)
+            {
+                return validation;
+            }
+            var model = Try(() =>
+            {
+                var result = true;
+                return result;
             }, out bool isSuccessfull);
             if (isSuccessfull)
             {
