@@ -1,4 +1,5 @@
 ﻿using Domain.Models.Applications;
+using InternalServices.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,12 @@ namespace WebAPIGateway.Controllers.Applications
     [ApiVersion("1.0")]
     public class ApplicationsControllerV1 : IdentityControllersBase
     {
+        private readonly IApplicationsService _service;
+
+        public ApplicationsControllerV1(IApplicationsService service)
+        {
+            _service = service;
+        }
         /// <summary>
         /// Returns a list of applications registered in the microservice
         /// </summary>
@@ -26,13 +33,8 @@ namespace WebAPIGateway.Controllers.Applications
         {
             var model = Try(() =>
              {
-                 List<ApplicationsListModel> model = new List<ApplicationsListModel>();
-                 model.Add(new ApplicationsListModel
-                 {
-                     ApplicationId = 1,
-                     ApplicationName = "E-Farmer.pk",
-                     CreatedDate = DateTime.Now
-                 });
+                 List<ApplicationsListModel> model = _service.GetApplicationsList();
+
                  return model;
              }, out bool isSuccessfull);
             if (isSuccessfull)
@@ -56,7 +58,7 @@ namespace WebAPIGateway.Controllers.Applications
         {
             var model = Try(() =>
             {
-                var isValidated = true;
+                bool isValidated = _service.ValidateApplicationSecret(key);
                 return isValidated;
             }, out bool isSuccessfull);
             if (isSuccessfull)
@@ -80,7 +82,7 @@ namespace WebAPIGateway.Controllers.Applications
         {
             var model = Try(() =>
             {
-                var secret = "AezaIwxfyupoossnjnjnlmmllm";
+                string secret = _service.GenerateApplicationSecret(appId);
                 return secret;
             }, out bool isSuccessfull);
             if (isSuccessfull)
@@ -109,7 +111,8 @@ namespace WebAPIGateway.Controllers.Applications
             }
             var model = Try(() =>
             {
-                var secret = "AezaIwxfyupoossnjnjnlmmllm";
+                appInfo.CreatedDate = DateTime.Now;
+                var secret = _service.CreateNewApplication(appInfo);
                 return secret;
             }, out bool isSuccessfull);
             if (isSuccessfull)
@@ -138,7 +141,8 @@ namespace WebAPIGateway.Controllers.Applications
             }
             var model = Try(() =>
             {
-                var status = true;
+                appInfo.ModifiedDate = DateTime.Now;
+                bool status = _service.UpdateApplicationInfo(appInfo);
                 return status;
             }, out bool isSuccessfull);
             if (isSuccessfull)

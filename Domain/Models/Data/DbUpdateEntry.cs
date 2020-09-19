@@ -14,6 +14,6 @@ namespace Domain.Models.Data
         /// <summary>
         /// Date and Time of changing the record
         /// </summary>
-        public DateTime ModifiedTime { get; set; }
+        public DateTime ModifiedDate { get; set; }
     }
 }

@@ -69,14 +69,14 @@ namespace Domain.Infrastucture
             var interfaces = assembly.ExportedTypes
                 .Where(x => x.IsInterface && interfacePredicate(x))
                 .ToList();
-            var implementations = assembly.ExportedTypes
+            var implementations = assembly.GetTypes()
                 .Where(x => !x.IsInterface && !x.IsAbstract && implementationPredicate(x))
                 .ToList();
             foreach (var @interface in interfaces)
             {
                 var implementation = implementations.FirstOrDefault(x => @interface.IsAssignableFrom(x));
                 if (implementation == null) continue;
-                services.AddScoped(@interface, implementation);
+                services.AddTransient(@interface, implementation);
             }
             return services;
         }

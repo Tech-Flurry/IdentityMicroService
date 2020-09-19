@@ -15,7 +15,7 @@ namespace DataAcess.Infrastructure
         public static void UseDAL(this IServiceCollection services)
         {
             var assembly = Assembly.GetExecutingAssembly();
-            services.AddTransientByConvention(assembly, x => x.Name.EndsWith("Repository"));
+            services.AddTransientByConvention(assembly, x => x.Name.EndsWith("Repository"), x => x.Name.EndsWith("Repository"));
         }
     }
 }

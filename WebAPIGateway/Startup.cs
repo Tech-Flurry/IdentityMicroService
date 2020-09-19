@@ -66,7 +66,13 @@ namespace WebAPIGateway
             });
             var dbConfiguration = new DbConfiguration(Configuration.GetConnectionString("DefaultConnection"), 1000);
             services.SetupDb(dbConfiguration);
-            services.UseInternalServices();
+            services.UseInternalServices(new InternalServices.Infrastructure.Setup.Options
+            {
+                CryptographicKey = "1234567890123456",
+                Salt = "786",
+                ApplictionSessionTimeout = 5,
+                UserSessionTimeout = 5
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
