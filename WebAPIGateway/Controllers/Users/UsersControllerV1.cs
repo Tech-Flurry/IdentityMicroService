@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Domain.Models.Users;
-using Domain.Validators.Users;
-using Microsoft.AspNetCore.Http;
+﻿using Domain.Models.Users;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using WebAPIGateway.Infrastructure;
 using WebAPIGateway.Infrastructure.InternalModels;
 
