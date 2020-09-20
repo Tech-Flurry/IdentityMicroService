@@ -20,7 +20,8 @@ namespace Domain.Validators.Users
             RuleFor(x => x.Password).NotNull().NotEmpty().WithMessage("Password is required")
                                     .SetValidator(new PasswordValidator());
             RuleFor(x => x.PasswordConfirm).NotNull().Equal(x => x.Password).WithMessage("Passwords do not match");
-
+            RuleFor(x => x.Username).NotNull().NotEmpty().WithMessage("Username is required")
+                                    .SetValidator(new UsernameValidator());
         }
     }
 }

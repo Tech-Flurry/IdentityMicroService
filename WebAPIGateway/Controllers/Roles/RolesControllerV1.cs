@@ -1,5 +1,7 @@
 ﻿using Domain.Models.Roles;
+using InternalServices.Abstractions;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using WebAPIGateway.Infrastructure;
 using WebAPIGateway.Infrastructure.InternalModels;
@@ -14,6 +16,12 @@ namespace WebAPIGateway.Controllers.Roles
     [ApiVersion("1.0")]
     public class RolesControllerV1 : IdentityControllersBase
     {
+        private readonly IRolesService _service;
+
+        public RolesControllerV1(IRolesService service)
+        {
+            _service = service;
+        }
         /// <summary>
         /// Returns a list of roles associated to an application
         /// </summary>
@@ -26,17 +34,7 @@ namespace WebAPIGateway.Controllers.Roles
         {
             var model = Try(() =>
             {
-                List<RolesListModel> model = new List<RolesListModel>();
-                model.Add(new RolesListModel
-                {
-                    RoleId = 1,
-                    RoleName = "Admin"
-                });
-                model.Add(new RolesListModel
-                {
-                    RoleId = 2,
-                    RoleName = "User"
-                });
+                List<RolesListModel> model = _service.GetApplicationRoles(key);
                 return model;
             }, out bool isSuccessfull);
             if (isSuccessfull)
@@ -51,8 +49,6 @@ namespace WebAPIGateway.Controllers.Roles
         /// <summary>
         /// Creates a new role for the applcation
         /// </summary>
-        /// <param name="role">Role Name</param>
-        /// <param name="key">Application's secret key</param>
         /// <returns></returns>
         [HttpPost("AddNewRole")]
         [ProducesResponseType(200, Type = typeof(bool))]
@@ -66,7 +62,8 @@ namespace WebAPIGateway.Controllers.Roles
             }
             var model = Try(() =>
             {
-                var status = true;
+                roleData.CreatedDate = DateTime.Now;
+                bool status = _service.AddNewApplicationRole(roleData);
                 return status;
             }, out bool isSuccessfull);
             if (isSuccessfull)
@@ -91,7 +88,7 @@ namespace WebAPIGateway.Controllers.Roles
         {
             var model = Try(() =>
             {
-                var status = true;
+                bool status = _service.RemoveRole(role, key);
                 return status;
             }, out bool isSuccessfull);
             if (isSuccessfull)
@@ -115,7 +112,31 @@ namespace WebAPIGateway.Controllers.Roles
         {
             var model = Try(() =>
             {
-                var status = true;
+                bool status = _service.DisableRole(role, key);
+                return status;
+            }, out bool isSuccessfull);
+            if (isSuccessfull)
+            {
+                return Ok(model);
+            }
+            else
+            {
+                return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
+            }
+        }
+        /// <summary>
+        /// Enables the activity of all actions under this role in an application
+        /// </summary>
+        /// <param name="role">Role Name</param>
+        /// <param name="key">Application's secret key</param>
+        [HttpGet("EnableRole")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        [ProducesErrorResponseType(typeof(APIErrorResponse))]
+        public IActionResult EnableRole(string role, string key)
+        {
+            var model = Try(() =>
+            {
+                bool status = _service.EnableRole(role, key);
                 return status;
             }, out bool isSuccessfull);
             if (isSuccessfull)

@@ -11,13 +11,13 @@ namespace InternalServices.Services
     internal class ApplicationsService : IApplicationsService
     {
         private readonly IApplicationsRepository _repository;
-        private readonly ICryptography _cryptography;
+        private readonly ITokenHandler _tokenHandler;
         private readonly ISessionTimeouts _timeouts;
 
-        public ApplicationsService(IApplicationsRepository repository, ICryptography cryptography, ISessionTimeouts timeouts)
+        public ApplicationsService(IApplicationsRepository repository, ITokenHandler tokenHandler, ISessionTimeouts timeouts)
         {
             _repository = repository;
-            _cryptography = cryptography;
+            _tokenHandler = tokenHandler;
             _timeouts = timeouts;
         }
         public string CreateNewApplication(CreateApplicationModel appInfo)
@@ -44,8 +44,7 @@ namespace InternalServices.Services
         }
         private string GenerateApplicationSecret(ApplicationGenerateModel application)
         {
-            var json = JsonConvert.SerializeObject(application);
-            var encryptedKey = _cryptography.Encrypt(json);
+            var encryptedKey = _tokenHandler.SerializeToken(application);
             return encryptedKey;
         }
         public List<ApplicationsListModel> GetApplicationsList()
@@ -65,14 +64,16 @@ namespace InternalServices.Services
             var flag = false;
             try
             {
-                var json = _cryptography.Decrypt(key);
-                ApplicationGenerateModel application = JsonConvert.DeserializeObject<ApplicationGenerateModel>(json);
-                bool isExists = _repository.IsApplicationExists(application.AppId);
-                if (isExists)
+                var application = _tokenHandler.DeserializeToken<ApplicationGenerateModel>(key, out bool isValidToken);
+                if (isValidToken)
                 {
-                    if (application.SessionExpire > DateTime.Now)
+                    bool isExists = _repository.IsApplicationExists(application.AppId);
+                    if (isExists)
                     {
-                        flag = true;
+                        if (application.SessionExpire > DateTime.Now)
+                        {
+                            flag = true;
+                        }
                     }
                 }
             }
