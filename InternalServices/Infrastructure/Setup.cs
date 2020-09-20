@@ -1,6 +1,5 @@
 ﻿using DataAcess.Infrastructure;
 using Domain.Infrastucture;
-using Domain.Infrastucture.Abstractions;
 using InternalServices.Infrastructure.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -17,6 +16,7 @@ namespace InternalServices.Infrastructure
             services.AddSingleton<IEncryptionKey>(x => new EncryptionKey(options.CryptographicKey));
             services.AddSingleton<ISaltValue>(x => new SaltValue(options.Salt));
             services.AddSingleton<ICryptography, Cryptography>();
+            services.AddSingleton<ITokenHandler, TokenHandler>();
             services.AddSingleton<ISessionTimeouts>(x => new SessionTimeouts(options.ApplictionSessionTimeout, options.UserSessionTimeout));
 
             //Implementing Convention based dependency Injection
