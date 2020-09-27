@@ -7,8 +7,8 @@
         /// </summary>
         public string MobileNumber { get; set; }
         /// <summary>
-        /// Unique username for the user account
+        /// Unique UserSecret for the user account
         /// </summary>
-        public string Username { get; set; }
+        public string UserSecret { get; set; }
     }
 }

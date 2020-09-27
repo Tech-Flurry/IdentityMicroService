@@ -1,5 +1,7 @@
 ﻿using Domain.Models.Users;
+using InternalServices.Abstractions;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using WebAPIGateway.Infrastructure;
 using WebAPIGateway.Infrastructure.InternalModels;
@@ -11,6 +13,12 @@ namespace WebAPIGateway.Controllers.Users
     [ApiVersion("1.0")]
     public class UsersControllerV1 : IdentityControllersBase
     {
+        private readonly IUsersService _service;
+
+        public UsersControllerV1(IUsersService service)
+        {
+            _service = service;
+        }
         /// <summary>
         /// Action to get list of registered users with this micro-service
         /// </summary>
@@ -23,19 +31,7 @@ namespace WebAPIGateway.Controllers.Users
         {
             var model = Try(() =>
             {
-                List<UserListingModel> model = new List<UserListingModel>();
-                model.Add(new UserListingModel
-                {
-                    Country = "Pakstan",
-                    Email = "abc@gmail.com",
-                    Id = 1,
-                    MobileNumber = "+923214302360",
-                    UserFullName = new Domain.ValueObjects.Name
-                    {
-                        FirstName = "Umair",
-                        LastName = "Tahir"
-                    }
-                });
+                List<UserListingModel> model = _service.GetRegisteredUsersList(key);
                 return model;
             }, out bool isSuccessfull);
             if (isSuccessfull)
@@ -65,7 +61,8 @@ namespace WebAPIGateway.Controllers.Users
             }
             var model = Try(() =>
             {
-                var userSecret = "AezaIwxfyupoossnjnjnlmmllm";
+                userInfo.CreatedDate = DateTime.Now;
+                string userSecret = _service.CreateNewUser(userInfo);
                 return userSecret;
             }, out bool isSuccessfull);
             if (isSuccessfull)
@@ -85,7 +82,7 @@ namespace WebAPIGateway.Controllers.Users
         [HttpPost("UpdateUser")]
         [ProducesResponseType(200, Type = typeof(string))]
         [ProducesErrorResponseType(typeof(APIErrorResponse))]
-        public IActionResult UpdateUser([FromBody] UpdateUserModel userInfo)
+        public IActionResult UpdateUser([FromBody] UpdateUserModel userInfo, string key)
         {
             var validation = ValidateModel();
             if (validation != null)
@@ -94,7 +91,8 @@ namespace WebAPIGateway.Controllers.Users
             }
             var model = Try(() =>
             {
-                var userSecret = "AezaIwxfyupoossnjnjnlmmllm";
+                userInfo.ModifiedDate = DateTime.Now;
+                string userSecret = _service.UpdateUser(userInfo, key);
                 return userSecret;
             }, out bool isSuccessfull);
             if (isSuccessfull)
@@ -119,7 +117,32 @@ namespace WebAPIGateway.Controllers.Users
         {
             var model = Try(() =>
             {
-                var result = true;
+                bool result = _service.DisableUser(username, key);
+                return result;
+            }, out bool isSuccessfull);
+            if (isSuccessfull)
+            {
+                return Ok(model);
+            }
+            else
+            {
+                return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
+            }
+        }
+        /// <summary>
+        /// Enables a user to perform activity
+        /// </summary>
+        /// <param name="username">Unqiue username</param>
+        /// <param name="key">Application's secret key</param>
+        /// <returns></returns>
+        [HttpGet("DisableUser")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        [ProducesErrorResponseType(typeof(APIErrorResponse))]
+        public IActionResult EnableUser(string username, string key)
+        {
+            var model = Try(() =>
+            {
+                bool result = _service.EnableUser(username, key);
                 return result;
             }, out bool isSuccessfull);
             if (isSuccessfull)
@@ -149,8 +172,8 @@ namespace WebAPIGateway.Controllers.Users
             }
             var model = Try(() =>
             {
-                var otp = "otp";
-                return otp;
+                var message = _service.UpdatePhoneNumber(userInfo, key);
+                return message;
             }, out bool isSuccessfull);
             if (isSuccessfull)
             {
@@ -161,35 +184,35 @@ namespace WebAPIGateway.Controllers.Users
                 return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
             }
         }
-        /// <summary>
-        /// Checks the OTP and confirm phone number update
-        /// </summary>
-        /// <param name="userInfo">Data for the user to be updated</param>
-        /// <param name="key">Application's secret key</param>
-        /// <returns></returns>
-        [HttpPost("UpdatePhoneNumberConfirmation")]
-        [ProducesResponseType(200, Type = typeof(bool))]
-        [ProducesErrorResponseType(typeof(APIErrorResponse))]
-        public IActionResult UpdatePhoneNumberConfirmation([FromBody] UpdatePhoneNumberConfirmationModel userInfo, [FromQuery] string key)
-        {
-            var validation = ValidateModel();
-            if (validation != null)
-            {
-                return validation;
-            }
-            var model = Try(() =>
-            {
-                var result = true;
-                return result;
-            }, out bool isSuccessfull);
-            if (isSuccessfull)
-            {
-                return Ok(model);
-            }
-            else
-            {
-                return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
-            }
-        }
+        ///// <summary>
+        ///// Checks the OTP and confirm phone number update
+        ///// </summary>
+        ///// <param name="userInfo">Data for the user to be updated</param>
+        ///// <param name="key">Application's secret key</param>
+        ///// <returns></returns>
+        //[HttpPost("UpdatePhoneNumberConfirmation")]
+        //[ProducesResponseType(200, Type = typeof(bool))]
+        //[ProducesErrorResponseType(typeof(APIErrorResponse))]
+        //public IActionResult UpdatePhoneNumberConfirmation([FromBody] UpdatePhoneNumberConfirmationModel userInfo, [FromQuery] string key)
+        //{
+        //    var validation = ValidateModel();
+        //    if (validation != null)
+        //    {
+        //        return validation;
+        //    }
+        //    var model = Try(() =>
+        //    {
+        //        bool result = true;
+        //        return result;
+        //    }, out bool isSuccessfull);
+        //    if (isSuccessfull)
+        //    {
+        //        return Ok(model);
+        //    }
+        //    else
+        //    {
+        //        return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
+        //    }
+        //}
     }
 }

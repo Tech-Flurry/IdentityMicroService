@@ -1,11 +1,12 @@
-﻿using Domain.ValueObjects;
+﻿using Domain.Models.Data;
+using Domain.ValueObjects;
 
 namespace Domain.Models.Users
 {
     /// <summary>
     /// Model to hold data to create a user
     /// </summary>
-    public class CreateUserModel
+    public class CreateUserModel : DbCreationEntry
     {
         /// <summary>
         /// Full name of the user

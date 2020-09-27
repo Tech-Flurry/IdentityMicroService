@@ -1,11 +1,12 @@
-﻿using Domain.ValueObjects;
+﻿using Domain.Models.Data;
+using Domain.ValueObjects;
 
 namespace Domain.Models.Users
 {
     /// <summary>
     /// Model to hold data to update a user
     /// </summary>
-    public class UpdateUserModel
+    public class UpdateUserModel : DbUpdateEntry
     {
         /// <summary>
         /// Primary Key
@@ -16,7 +17,7 @@ namespace Domain.Models.Users
         /// </summary>
         public Name FullName { get; set; }
         /// <summary>
-        /// Application Secret Key
+        /// User Secret Token
         /// </summary>
         public string Key { get; set; }
     }

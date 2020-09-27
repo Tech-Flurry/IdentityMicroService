@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using DataAcess.Infrastructure;
 using Domain.Infrastucture;
+using Domain.Models.Email;
 using FluentValidation.AspNetCore;
 using InternalServices.Infrastructure;
 using Microsoft.AspNetCore.Builder;
@@ -34,6 +35,7 @@ namespace WebAPIGateway
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.Configure<EmailConfiguration>(Configuration.GetSection("EmailConfiguration"));
             services.AddApiVersioning(x =>
             {
                 x.DefaultApiVersion = new ApiVersion(1, 0);
@@ -71,8 +73,10 @@ namespace WebAPIGateway
                 CryptographicKey = "1234567890123456",
                 Salt = "786",
                 ApplictionSessionTimeout = 5,
-                UserSessionTimeout = 5
-            });
+                UserSessionTimeout = 5,
+                OTPExpirySpan = 300,
+                OTPLength = 5
+            }); ;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

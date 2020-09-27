@@ -40,6 +40,20 @@ namespace DataAcess.Infrastructure
         /// <returns></returns>
         List<T> GetListResult<T>(string query, CommandType commandType, out bool isDataFound, object @params = null, IDbTransaction transaction = null);
         /// <summary>
+        /// Returns the data extracted from the db in the form of list (Multi object mapper)
+        /// </summary>
+        /// <typeparam name="T">Any Model Matching the query result</typeparam>
+        /// <typeparam name="U">Sub-model</typeparam>
+        /// <param name="query">The command which fetches the data</param>
+        /// <param name="commandType">Type of the command</param>
+        /// <param name="map">object mapping anonymous function</param>
+        /// <param name="isDataFound">Out flag which indicates the presence of data</param>
+        /// <param name="params">parameters of a query</param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        List<T> GetListResult<T, U>(string query, CommandType commandType, Func<T, U, T> map, out bool isDataFound, object @params = null, IDbTransaction transaction = null);
+
+        /// <summary>
         /// Returns the first column of the row of the data extracted from the db
         /// </summary>
         /// <typeparam name="T">Any Model Matching the query result</typeparam>
@@ -60,6 +74,19 @@ namespace DataAcess.Infrastructure
         /// <param name="transaction"></param>
         /// <returns></returns>
         T GetSingleResult<T>(string query, CommandType commandType, out bool isDataFound, object @params = null, IDbTransaction transaction = null);
+        /// <summary>
+        /// Returns the first row of the data extracted from the db (Multi object mapper)
+        /// </summary>
+        /// <typeparam name="T">Any Model Matching the query result</typeparam>
+        /// <typeparam name="U">Sub-model</typeparam>
+        /// <param name="query">The command which fetches the data</param>
+        /// <param name="commandType">Type of the command</param>
+        /// <param name="map">object mapping anonymous function</param>
+        /// <param name="isDataFound">Out flag which indicates the presence of data</param>
+        /// <param name="params">parameters of a query</param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        T GetSingleResult<T, U>(string query, CommandType commandType, Func<T, U, T> map, out bool isDataFound, object @params = null, IDbTransaction transaction = null);
     }
 
     /// <summary>
@@ -94,6 +121,28 @@ namespace DataAcess.Infrastructure
             return result;
         }
         /// <summary>
+        /// Returns the data extracted from the db in the form of list (Multi object mapper)
+        /// </summary>
+        /// <typeparam name="T">Any Model Matching the query result</typeparam>
+        /// <typeparam name="U">Sub-model</typeparam>
+        /// <param name="query">The command which fetches the data</param>
+        /// <param name="commandType">Type of the command</param>
+        /// <param name="map">object mapping anonymous function</param>
+        /// <param name="isDataFound">Out flag which indicates the presence of data</param>
+        /// <param name="params">parameters of a query</param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        public List<T> GetListResult<T, U>(string query, CommandType commandType, Func<T, U, T> map, out bool isDataFound, object @params = null, IDbTransaction transaction = null)
+        {
+            List<T> result;
+            using (System.Data.IDbConnection con = new SqlConnection(_configuration.ConnectionString))
+            {
+                result = con.Query<T, U, T>(sql: query, commandType: commandType, commandTimeout: _configuration.ConnectionTimeout, param: @params, transaction: transaction, map: map).ToList();
+            }
+            isDataFound = (result != null || result.Count > 0);
+            return result;
+        }
+        /// <summary>
         /// Returns the first row of the data extracted from the db
         /// </summary>
         /// <typeparam name="T">Any Model Matching the query result</typeparam>
@@ -109,6 +158,28 @@ namespace DataAcess.Infrastructure
             using (System.Data.IDbConnection con = new SqlConnection(_configuration.ConnectionString))
             {
                 result = con.Query<T>(sql: query, commandType: commandType, commandTimeout: _configuration.ConnectionTimeout, param: @params, transaction: transaction).First();
+            }
+            isDataFound = (result != null);
+            return result;
+        }
+        /// <summary>
+        /// Returns the first row of the data extracted from the db (Multi object mapper)
+        /// </summary>
+        /// <typeparam name="T">Any Model Matching the query result</typeparam>
+        /// <typeparam name="U">Sub-model</typeparam>
+        /// <param name="query">The command which fetches the data</param>
+        /// <param name="commandType">Type of the command</param>
+        /// <param name="map">object mapping anonymous function</param>
+        /// <param name="isDataFound">Out flag which indicates the presence of data</param>
+        /// <param name="params">parameters of a query</param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        public T GetSingleResult<T, U>(string query, CommandType commandType, Func<T, U, T> map, out bool isDataFound, object @params = null, IDbTransaction transaction = null)
+        {
+            T result;
+            using (System.Data.IDbConnection con = new SqlConnection(_configuration.ConnectionString))
+            {
+                result = con.Query<T, U, T>(sql: query, commandType: commandType, commandTimeout: _configuration.ConnectionTimeout, param: @params, transaction: transaction, map: map).Single();
             }
             isDataFound = (result != null);
             return result;
