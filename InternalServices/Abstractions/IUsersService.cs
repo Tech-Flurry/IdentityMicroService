@@ -45,5 +45,7 @@ namespace InternalServices.Abstractions
         /// <returns></returns>
         bool EnableUser(string username, string key);
         bool IsUsernameAvailable(string username, string appKey);
+        string AddUserRoles(UserRolesModel userRoles, string appKey);
+        string RemoveUserRoles(UserRolesModel userRoles, string appKey);
     }
 }

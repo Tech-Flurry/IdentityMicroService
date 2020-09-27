@@ -119,8 +119,16 @@ namespace Domain.Infrastucture
             PropertyInfo[] Props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (PropertyInfo prop in Props)
             {
+                Type type;
+                if (prop.PropertyType == typeof(object))
+                {
+                    type = typeof(string);
+                }
+                else
+                {
+                    type = (prop.PropertyType.IsGenericType && prop.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>) ? Nullable.GetUnderlyingType(prop.PropertyType) : prop.PropertyType);
+                }
                 //Defining type of data column gives proper data table 
-                var type = (prop.PropertyType.IsGenericType && prop.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>) ? Nullable.GetUnderlyingType(prop.PropertyType) : prop.PropertyType);
                 //Setting column names as Property names
                 dataTable.Columns.Add(prop.Name, type);
             }

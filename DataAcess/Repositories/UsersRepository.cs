@@ -16,6 +16,20 @@ namespace DataAcess.Repositories
         {
             _db = db;
         }
+
+        public bool AddRoles(UserRolesModel userRoles, int appId)
+        {
+            var query = "ADD_USER_ROLES";
+            var p = new
+            {
+                username = userRoles.Username,
+                appId,
+                roles = userRoles.Roles.ToDataTable().AsTableValuedParameter("UserRolesType2")
+            };
+            _db.ExecuteQuery(query, System.Data.CommandType.StoredProcedure, out bool isSuccessfull, p);
+            return isSuccessfull;
+        }
+
         public bool ChangeDisableFlag(long userId, bool isDisabled)
         {
             var query = "update USERS set IsDisabled=@isDisabled where UserId=@userId";
@@ -37,7 +51,7 @@ namespace DataAcess.Repositories
                 email = model.Email,
                 country = 1,
                 appId,
-                roles = model.Roles.ToDataTable().AsTableValuedParameter("UserRolesType")
+                roles = model.Roles.ToDataTable().AsTableValuedParameter("UserRolesType2")
             };
             _db.ExecuteQuery(query, System.Data.CommandType.StoredProcedure, out bool isSuccessfull, @params);
             return isSuccessfull;
@@ -86,6 +100,19 @@ namespace DataAcess.Repositories
             };
             var count = _db.GetScalerResult<int>(query, System.Data.CommandType.Text, out _, p);
             return count > 0;
+        }
+
+        public bool RemoveRoles(UserRolesModel userRoles, int appId)
+        {
+            var query = "REMOVE_USER_ROLES";
+            var p = new
+            {
+                username = userRoles.Username,
+                appId,
+                roles = userRoles.Roles.ToDataTable().AsTableValuedParameter("UserRolesType2")
+            };
+            _db.ExecuteQuery(query, System.Data.CommandType.StoredProcedure, out bool isSuccessfull, p);
+            return isSuccessfull;
         }
 
         public bool UpdatePhoneNumber(UserPhoneNumberParam model, int appId)

@@ -40,7 +40,7 @@ namespace DataAcess.Repositories
 
         public void DeleteAllExpiredOTPs()
         {
-            var query = "DELETE FROM OTPS WHERE EXPIRYTIME>=@currentDate";
+            var query = "DELETE FROM OTPS WHERE EXPIRYTIME<=@currentDate";
             var p = new
             {
                 currentDate = DateTime.Now

@@ -48,5 +48,7 @@ namespace DataAcess.Abstractions
         /// <param name="appId"></param>
         /// <returns></returns>
         bool UpdateUser(UpdateUserModel model, int appId);
+        bool AddRoles(UserRolesModel userRoles, int appId);
+        bool RemoveRoles(UserRolesModel userRoles, int appId);
     }
 }

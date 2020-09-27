@@ -22,6 +22,7 @@ namespace InternalServices.Infrastructure
             services.AddSingleton<IOTPConfiguration>(x => new OTPConfiguration(options.OTPExpirySpan, options.OTPLength));
             services.AddSingleton<IHasher, Hasher>();
             services.AddSingleton<IEmailHandler, EmailHandler>();
+            services.AddSingleton<IOTPService, OTPService>();
             //Implementing Convention based dependency Injection
             services.AddTransientByConvention(Assembly.GetExecutingAssembly(), x => x.Name.EndsWith("Service"), x => x.Name.EndsWith("Service"));
         }

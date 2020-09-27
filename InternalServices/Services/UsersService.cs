@@ -5,6 +5,7 @@ using Domain.Models.OTP;
 using Domain.Models.Users;
 using InternalServices.Abstractions;
 using InternalServices.Infrastructure.Abstractions;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
 namespace InternalServices.Services
@@ -15,16 +16,19 @@ namespace InternalServices.Services
         private readonly IUsersRepository _repository;
         private readonly IApplicationsService _applicationsService;
         private readonly ITokenHandler _tokenHandler;
+        private readonly IHasher _hasher;
 
         public UsersService(IOTPService otpService,
                             IUsersRepository repository,
                             IApplicationsService applicationsService,
-                            ITokenHandler tokenHandler)
+                            ITokenHandler tokenHandler,
+                            IHasher hasher)
         {
             _otpService = otpService;
             _repository = repository;
             _applicationsService = applicationsService;
             _tokenHandler = tokenHandler;
+            _hasher = hasher;
         }
         public string CreateNewUser(CreateUserModel userInfo)
         {
@@ -36,6 +40,8 @@ namespace InternalServices.Services
                 var isUsernameAvailable = !(_repository.IsExists(userInfo.Username, application.AppId));
                 if (isUsernameAvailable)
                 {
+                    userInfo.Password = _hasher.GetHash(userInfo.Password);
+                    userInfo.PasswordConfirm = string.Empty;
                     MethodInvokeModel confirmationMethod = new MethodInvokeModel
                     {
                         MethodName = "CreateNewUser",
@@ -196,6 +202,38 @@ namespace InternalServices.Services
                 var application = _tokenHandler.DeserializeToken<ApplicationGenerateModel>(appKey, out _);
                 var isUsernameAvailable = !(_repository.IsExists(username, application.AppId));
                 result = isUsernameAvailable;
+            }
+            return result;
+        }
+
+        public string AddUserRoles(UserRolesModel userRoles, string appKey)
+        {
+            var result = "Unable to add the role(s)";
+            var isValid = _applicationsService.ValidateApplicationSecret(appKey);
+            if (isValid)
+            {
+                var application = _tokenHandler.DeserializeToken<ApplicationGenerateModel>(appKey, out _);
+                bool isAdded = _repository.AddRoles(userRoles, application.AppId);
+                if (isAdded)
+                {
+                    result = "Role(s) added successfully";
+                }
+            }
+            return result;
+        }
+
+        public string RemoveUserRoles(UserRolesModel userRoles, string appKey)
+        {
+            var result = "Unable to remove the role(s)";
+            var isValid = _applicationsService.ValidateApplicationSecret(appKey);
+            if (isValid)
+            {
+                var application = _tokenHandler.DeserializeToken<ApplicationGenerateModel>(appKey, out _);
+                bool isRemoved = _repository.RemoveRoles(userRoles, application.AppId);
+                if (isRemoved)
+                {
+                    result = "Role(s) removed successfully";
+                }
             }
             return result;
         }

@@ -43,6 +43,10 @@ namespace Domain.Models.Users
         /// <summary>
         /// Roles to add user in for an application
         /// </summary>
-        public string[] Roles { get; set; }
+        public Roles[] Roles { get; set; }
+    }
+    public class Roles
+    {
+        public string RoleName { get; set; }
     }
 }

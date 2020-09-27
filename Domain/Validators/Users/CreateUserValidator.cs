@@ -15,8 +15,8 @@ namespace Domain.Validators.Users
             RuleFor(x => x.Country).NotNull().GreaterThan(0).WithMessage("Country is required");
             RuleFor(x => x.Email).NotNull().WithMessage("Email address is required")
                                 .EmailAddress().WithMessage("Please enter a valid email address");
-            RuleFor(x => x.MobileNumber).NotNull().WithMessage("Phone number is required")
-                                        .SetValidator(new MobilePhoneValidator());
+            RuleFor(x => x.MobileNumber).NotNull().WithMessage("Phone number is required");
+                                        //.SetValidator(new MobilePhoneValidator());
             RuleFor(x => x.Password).NotNull().NotEmpty().WithMessage("Password is required")
                                     .SetValidator(new PasswordValidator());
             RuleFor(x => x.PasswordConfirm).NotNull().Equal(x => x.Password).WithMessage("Passwords do not match");

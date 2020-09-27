@@ -46,11 +46,12 @@ namespace InternalServices.Infrastructure
         {
             var message = "Otp generation unsuccessful.";
             string newOtp;
+            string hashedOtp;
             do
             {
                 newOtp = GetOTP();
-            } while (!_repository.IsExists(newOtp));
-            var hashedOtp = _hasher.GetHash(newOtp);
+                hashedOtp = _hasher.GetHash(newOtp);
+            } while (_repository.IsExists(hashedOtp));
             bool result = _repository.AddOTP(hashedOtp, confirmationMethod, _config.GetOTPExpireSpan());
             Functions.SetTimeout(() =>
             {
@@ -76,7 +77,7 @@ namespace InternalServices.Infrastructure
                 var hashedOtp = _hasher.GetHash(otp);
                 if (_repository.IsExists(hashedOtp))
                 {
-                    MethodInvokeModel confimationCallback = _repository.GetConfirmationInvokeMethod(otp);
+                    MethodInvokeModel confimationCallback = _repository.GetConfirmationInvokeMethod(hashedOtp);
                     if (confimationCallback != null)
                     {
                         message = CallConfirmationMethod(confimationCallback);
@@ -88,7 +89,6 @@ namespace InternalServices.Infrastructure
         public string CreateNewUserConfirmation(CreateUserModel model, int appId)
         {
             var message = invalidOTPMessage;
-            model.Password = _hasher.GetHash(model.Password);
             bool result = _usersRepository.CreateUser(model, appId);
             if (result)
             {
@@ -135,13 +135,14 @@ namespace InternalServices.Infrastructure
                     {
                         if (requestedParam.IsInJson)
                         {
-                            var convertionType = Assembly.GetExecutingAssembly().GetType(requestedParam.Type);
+                            var convertionType = Assembly.GetAssembly(typeof(CreateUserModel))
+                                .GetType(requestedParam.Type);
                             var obj = ((string)requestedParam.Value).ToObject(convertionType);
                             methodParameters[param.Position] = Convert.ChangeType(obj, convertionType);
                         }
                         else
                         {
-                            var convertionType = Assembly.GetExecutingAssembly().GetType(requestedParam.Type);
+                            var convertionType = Type.GetType(requestedParam.Type);
                             methodParameters[param.Position] = Convert.ChangeType(requestedParam.Value, convertionType);
                         }
                     }

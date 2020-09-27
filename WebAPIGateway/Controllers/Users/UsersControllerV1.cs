@@ -43,6 +43,25 @@ namespace WebAPIGateway.Controllers.Users
                 return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
             }
         }
+        [HttpGet("IsUsernameAvailable")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        [ProducesErrorResponseType(typeof(APIErrorResponse))]
+        public IActionResult IsUsernameAvailable(string username,string key)
+        {
+            var model = Try(() =>
+            {
+                bool model = _service.IsUsernameAvailable(username, key);
+                return model;
+            }, out bool isSuccessfull);
+            if (isSuccessfull)
+            {
+                return Ok(model);
+            }
+            else
+            {
+                return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
+            }
+        }
 
         /// <summary>
         /// Action to create a new user for an application
@@ -135,7 +154,7 @@ namespace WebAPIGateway.Controllers.Users
         /// <param name="username">Unqiue username</param>
         /// <param name="key">Application's secret key</param>
         /// <returns></returns>
-        [HttpGet("DisableUser")]
+        [HttpGet("EnableUser")]
         [ProducesResponseType(200, Type = typeof(bool))]
         [ProducesErrorResponseType(typeof(APIErrorResponse))]
         public IActionResult EnableUser(string username, string key)
@@ -173,6 +192,66 @@ namespace WebAPIGateway.Controllers.Users
             var model = Try(() =>
             {
                 var message = _service.UpdatePhoneNumber(userInfo, key);
+                return message;
+            }, out bool isSuccessfull);
+            if (isSuccessfull)
+            {
+                return Ok(model);
+            }
+            else
+            {
+                return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
+            }
+        }
+        /// <summary>
+        /// Adds new roles to the user
+        /// </summary>
+        /// <param name="userRoles"></param>
+        /// <param name="key">applcation secret key</param>
+        /// <returns></returns>
+        [HttpPost("AddRoles")]
+        [ProducesResponseType(200, Type = typeof(string))]
+        [ProducesErrorResponseType(typeof(APIErrorResponse))]
+        public IActionResult AddRoles([FromBody] UserRolesModel userRoles, [FromQuery] string key)
+        {
+            //var validation = ValidateModel();
+            //if (validation != null)
+            //{
+            //    return validation;
+            //}
+            var model = Try(() =>
+            {
+                string message = _service.AddUserRoles(userRoles, key);
+                return message;
+            }, out bool isSuccessfull);
+            if (isSuccessfull)
+            {
+                return Ok(model);
+            }
+            else
+            {
+                return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
+            }
+        }
+        /// <summary>
+        /// Removes roles to the user
+        /// </summary>
+        /// <param name="userRoles"></param>
+        /// <param name="key">applcation secret key</param>
+        /// <returns></returns>
+        [HttpPost("RemoveRoles")]
+        [ProducesResponseType(200, Type = typeof(string))]
+        [ProducesErrorResponseType(typeof(APIErrorResponse))]
+        public IActionResult RemoveRoles([FromBody] UserRolesModel userRoles, [FromQuery] string key)
+        {
+            //var validation = ValidateModel();
+            //if (validation != null)
+            //{
+            //    return validation;
+            //}
+            var model = Try(() =>
+            {
+                string message = _service.RemoveUserRoles(userRoles, key);
                 return message;
             }, out bool isSuccessfull);
             if (isSuccessfull)

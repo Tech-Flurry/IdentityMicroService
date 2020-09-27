@@ -2,7 +2,7 @@
 
 namespace InternalServices.Infrastructure.Abstractions
 {
-    internal interface IOTPService
+    public interface IOTPService
     {
         string GenerateOtp(string email, string phoneNumber, MethodInvokeModel confirmationMethod);
         string ValidateOTP(string otp, string appSecret);
