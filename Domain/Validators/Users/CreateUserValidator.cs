@@ -16,12 +16,12 @@ namespace Domain.Validators.Users
             RuleFor(x => x.Email).NotNull().WithMessage("Email address is required")
                                 .EmailAddress().WithMessage("Please enter a valid email address");
             RuleFor(x => x.MobileNumber).NotNull().WithMessage("Phone number is required");
-                                        //.SetValidator(new MobilePhoneValidator());
+            //.SetValidator(new MobilePhoneValidator());
             RuleFor(x => x.Password).NotNull().NotEmpty().WithMessage("Password is required")
-                                    .SetValidator(new PasswordValidator());
+                                    .SetValidator(PasswordValidator.GetValidator());
             RuleFor(x => x.PasswordConfirm).NotNull().Equal(x => x.Password).WithMessage("Passwords do not match");
             RuleFor(x => x.Username).NotNull().NotEmpty().WithMessage("Username is required")
-                                    .SetValidator(new UsernameValidator());
+                                    .SetValidator(UsernameValidator.GetValidator());
         }
     }
 }

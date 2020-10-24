@@ -72,8 +72,8 @@ namespace WebAPIGateway
             {
                 CryptographicKey = "1234567890123456",
                 Salt = "786",
-                ApplictionSessionTimeout = 5,
-                UserSessionTimeout = 5,
+                ApplictionSessionTimeout = 30,
+                UserSessionTimeout = 30,
                 OTPExpirySpan = 300,
                 OTPLength = 5
             }); ;

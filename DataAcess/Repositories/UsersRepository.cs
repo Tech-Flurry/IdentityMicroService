@@ -2,6 +2,7 @@
 using DataAcess.Abstractions;
 using DataAcess.Infrastructure;
 using Domain.Infrastucture;
+using Domain.Models.Account;
 using Domain.Models.Users;
 using Domain.ValueObjects;
 using System.Collections.Generic;
@@ -78,6 +79,49 @@ namespace DataAcess.Repositories
             return result;
         }
 
+        public UserInfoModel GetUserByName(string username, int appId)
+        {
+            var query = @"SELECT [UserId]
+                          ,[FirstName]
+                          ,[LastName]
+                          ,[Username]
+                          ,[PhoneNumber] as MobileNumber
+                          ,[Email]
+                          ,[Country]
+                          ,[AppId]
+                      FROM [USERS] t
+                    where t.AppId=@appId and t.Username=@username";
+            var p = new
+            {
+                appId,
+                username
+            };
+            var result = _db.GetSingleResult<UserInfoModel, Name>(query, System.Data.CommandType.Text, (user, name) =>
+            {
+                user.FullName = name;
+                return user;
+            }, out bool isUserFound, p);
+            if (isUserFound)
+            {
+                query = @"select ar.RoleName from USER_ROLES t
+                        inner join APPLICATION_ROLES ar on ar.RoleId=t.RoleId where t.UserId=@id";
+                var pId = new
+                {
+                    id = result.UserId
+                };
+                result.Roles = _db.GetListResult<Roles>(query, System.Data.CommandType.Text, out bool isRoleFound, pId);
+                if (!isRoleFound)
+                {
+                    result.Roles = new List<Roles>();
+                }
+            }
+            else
+            {
+                result = null;
+            }
+            return result;
+        }
+
         public long GetUserId(string username, int appId)
         {
             var query = "select UserId from USERS where Username=@username and AppId=@appId";
@@ -100,6 +144,37 @@ namespace DataAcess.Repositories
             };
             var count = _db.GetScalerResult<int>(query, System.Data.CommandType.Text, out _, p);
             return count > 0;
+        }
+
+        public UserToken Login(LoginModel loginInfo, int appId)
+        {
+            var query = "select u.UserId, u.Username, u.AppId from USERS u where u.Username=@username and u.PasswordHash=@password and u.AppId=@appId";
+            var p = new
+            {
+                appId,
+                username = loginInfo.Username,
+                password = loginInfo.Password
+            };
+            var result = _db.GetSingleResult<UserToken>(query, System.Data.CommandType.Text, out bool isUserFound, p);
+            if (isUserFound)
+            {
+                query = @"select ar.RoleName from USER_ROLES t
+                        inner join APPLICATION_ROLES ar on ar.RoleId=t.RoleId where t.UserId=@id";
+                var pId = new
+                {
+                    id = result.UserId
+                };
+                result.Roles = _db.GetListResult<string>(query, System.Data.CommandType.Text, out bool isRoleFound, pId);
+                if (!isRoleFound)
+                {
+                    result.Roles = new List<string>();
+                }
+            }
+            else
+            {
+                result = null;
+            }
+            return result;
         }
 
         public bool RemoveRoles(UserRolesModel userRoles, int appId)

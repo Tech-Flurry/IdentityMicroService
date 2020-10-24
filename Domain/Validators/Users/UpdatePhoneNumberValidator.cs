@@ -9,7 +9,7 @@ namespace Domain.Validators.Users
         public UpdatePhoneNumberValidator()
         {
             RuleFor(x => x.MobileNumber).NotEmpty().NotNull().WithMessage("MobileNumber is required")
-                                        .SetValidator(new MobilePhoneValidator());
+                                        .SetValidator(MobilePhoneValidator.GetValidator());
         }
     }
 }

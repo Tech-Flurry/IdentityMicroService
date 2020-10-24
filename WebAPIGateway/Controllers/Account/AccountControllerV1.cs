@@ -1,5 +1,7 @@
 ﻿using Domain.Models.Account;
+using InternalServices.Abstractions;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using WebAPIGateway.Infrastructure;
 using WebAPIGateway.Infrastructure.InternalModels;
 
@@ -10,6 +12,13 @@ namespace WebAPIGateway.Controllers.Account
     [ApiVersion("1.0")]
     public class AccountControllerV1 : IdentityControllersBase
     {
+        private readonly IAccountService _service;
+
+
+        public AccountControllerV1(IAccountService service)
+        {
+            _service = service;
+        }
         /// <summary>
         /// Action for the user to login into the system
         /// </summary>
@@ -28,7 +37,7 @@ namespace WebAPIGateway.Controllers.Account
             }
             var model = Try(() =>
             {
-                var userSecret = "AezaIwxfyupoossnjnjnlmmllm";
+                string userSecret = _service.Login(loginInfo, key);
                 return userSecret;
             }, out bool isSuccessfull);
             if (isSuccessfull)
@@ -46,10 +55,10 @@ namespace WebAPIGateway.Controllers.Account
         /// <param name="info"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        [HttpPost("ForgetPassword")]
+        [HttpPost("ChangePassword")]
         [ProducesResponseType(200, Type = typeof(string))]
         [ProducesErrorResponseType(typeof(APIErrorResponse))]
-        public IActionResult ForgetPassword([FromBody] ForgetPasswordModel info, [FromQuery] string key)
+        public IActionResult ChangePassword([FromBody] ChangePasswordModel info, [FromQuery] string key)
         {
             var validation = ValidateModel();
             if (validation != null)
@@ -58,7 +67,7 @@ namespace WebAPIGateway.Controllers.Account
             }
             var model = Try(() =>
             {
-                var otp = "";
+                string otp = _service.ChangePassword(info, key);
                 return otp;
             }, out bool isSuccessfull);
             if (isSuccessfull)
@@ -71,20 +80,26 @@ namespace WebAPIGateway.Controllers.Account
             }
         }
         /// <summary>
-        /// Action for the confirmation of chamged password
+        /// Checks the authentication for the user according to the roles
         /// </summary>
-        /// <param name="info"></param>
-        /// <param name="key"></param>
+        /// <param name="userKey"></param>
+        /// <param name="roles"></param>
+        /// <param name="appKey"></param>
         /// <returns></returns>
-        [HttpPost("ForgetPasswordConfirmation")]
-        [ProducesResponseType(200, Type = typeof(bool))]
+        [HttpPost("Authenticate")]
+        [ProducesResponseType(200, Type = typeof(AuthenticationResult))]
         [ProducesErrorResponseType(typeof(APIErrorResponse))]
-        public IActionResult ForgetPasswordConfirmation(ForgetPasswordConfirmationModel info, string key)
+        public IActionResult Authenticate(string userKey, string[] roles, string appKey)
         {
+            var validation = ValidateModel();
+            if (validation != null)
+            {
+                return validation;
+            }
             var model = Try(() =>
             {
-                var status = true;
-                return status;
+                AuthenticationResult result = _service.Authenticate(userKey, roles.ToList(), appKey);
+                return result;
             }, out bool isSuccessfull);
             if (isSuccessfull)
             {
@@ -95,5 +110,30 @@ namespace WebAPIGateway.Controllers.Account
                 return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
             }
         }
+        ///// <summary>
+        ///// Action for the confirmation of chamged password
+        ///// </summary>
+        ///// <param name="info"></param>
+        ///// <param name="key"></param>
+        ///// <returns></returns>
+        //[HttpPost("ForgetPasswordConfirmation")]
+        //[ProducesResponseType(200, Type = typeof(bool))]
+        //[ProducesErrorResponseType(typeof(APIErrorResponse))]
+        //public IActionResult ForgetPasswordConfirmation(ForgetPasswordConfirmationModel info, string key)
+        //{
+        //    var model = Try(() =>
+        //    {
+        //        var status = true;
+        //        return status;
+        //    }, out bool isSuccessfull);
+        //    if (isSuccessfull)
+        //    {
+        //        return Ok(model);
+        //    }
+        //    else
+        //    {
+        //        return BadRequest(new APIErrorResponse { ErrorMessage = "Internal Server Error" });
+        //    }
+        //}
     }
 }

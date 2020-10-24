@@ -64,7 +64,7 @@ namespace InternalServices.Infrastructure
                 _emailService.SendOTPMail(newOtp, email);
                 //sending otp to phone (not implemented yet)
 
-                message = $"You OTP has been sent to {email}.";
+                message = $"Your OTP has been sent to {email}.";
             }
             return message;
         }

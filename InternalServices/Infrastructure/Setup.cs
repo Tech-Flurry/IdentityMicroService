@@ -1,6 +1,5 @@
 ﻿using DataAcess.Infrastructure;
 using Domain.Infrastucture;
-using Domain.Models.Email;
 using InternalServices.Infrastructure.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -16,11 +15,11 @@ namespace InternalServices.Infrastructure
 
             services.AddSingleton<IEncryptionKey>(x => new EncryptionKey(options.CryptographicKey));
             services.AddSingleton<ISaltValue>(x => new SaltValue(options.Salt));
-            services.AddSingleton<ICryptography, Cryptography>();
-            services.AddSingleton<ITokenHandler, TokenHandler>();
+            services.AddTransient<ICryptography, Cryptography>();
+            services.AddTransient<ITokenHandler, TokenHandler>();
             services.AddSingleton<ISessionTimeouts>(x => new SessionTimeouts(options.ApplictionSessionTimeout, options.UserSessionTimeout));
             services.AddSingleton<IOTPConfiguration>(x => new OTPConfiguration(options.OTPExpirySpan, options.OTPLength));
-            services.AddSingleton<IHasher, Hasher>();
+            services.AddTransient<IHasher, Hasher>();
             services.AddSingleton<IEmailHandler, EmailHandler>();
             services.AddSingleton<IOTPService, OTPService>();
             //Implementing Convention based dependency Injection

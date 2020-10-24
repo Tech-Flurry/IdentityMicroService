@@ -1,4 +1,5 @@
-﻿using Domain.Models.Users;
+﻿using Domain.Models.Account;
+using Domain.Models.Users;
 using System.Collections.Generic;
 
 namespace DataAcess.Abstractions
@@ -48,7 +49,33 @@ namespace DataAcess.Abstractions
         /// <param name="appId"></param>
         /// <returns></returns>
         bool UpdateUser(UpdateUserModel model, int appId);
+        /// <summary>
+        /// Add roles to the user
+        /// </summary>
+        /// <param name="userRoles"></param>
+        /// <param name="appId"></param>
+        /// <returns></returns>
         bool AddRoles(UserRolesModel userRoles, int appId);
+        /// <summary>
+        /// Remove roles from the user
+        /// </summary>
+        /// <param name="userRoles"></param>
+        /// <param name="appId"></param>
+        /// <returns></returns>
         bool RemoveRoles(UserRolesModel userRoles, int appId);
+        /// <summary>
+        /// Perform Login from datatabase values
+        /// </summary>
+        /// <param name="loginInfo"></param>
+        /// <param name="appId"></param>
+        /// <returns></returns>
+        UserToken Login(LoginModel loginInfo, int appId);
+        /// <summary>
+        /// Returns User info by user name
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="appId"></param>
+        /// <returns></returns>
+        UserInfoModel GetUserByName(string username, int appId);
     }
 }
